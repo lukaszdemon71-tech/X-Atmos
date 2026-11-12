@@ -6,9 +6,6 @@ __pycache__/
 # Generated from ui/index.html by ui/dev/gen-harness.py.
 ui/dev/harness.html
 
-# Rendered previews from tools/vehicles/preview.py.
-tools/vehicles/out/
-
 # The shipped plugin under dist/ IS tracked — it is what gets dropped into
 # X-Plane. Only stray build output elsewhere is ignored.
 /*.xpl

@@ -156,7 +156,6 @@ ui/                   the panel: index.html, style.css, app.js
 ui/dev/               mock bridge + generators, so the panel runs in a browser
 tests/                969 checks, SDK stubs, UI wiring check
 scripts/              build-win-cross.sh (Linux -> Windows), SDK fetcher
-tools/vehicles/       OBJ8 model generator and a software renderer to check it
 dist/AtmoForge/       the built plugin, ready to drop into plugins/
 .github/workflows/    Windows build on push
 ```
@@ -173,15 +172,6 @@ TOOLCHAIN=/path/to/llvm-mingw/bin SDK=/path/to/xpsdk ./scripts/build-win-cross.s
 
 That script carries the flags that matter and refuses to produce a plugin
 X-Plane would reject — see its header comment for why each one is there.
-
-`tools/vehicles/` is separate from the plugin: it generates X-Plane ground
-vehicles as OBJ8 text and renders them to PNG so the geometry can be checked
-without opening the simulator.
-
-```bash
-python3 tools/vehicles/build_tug.py
-python3 tools/vehicles/preview.py tools/vehicles/out/pushback_tug/pushback_tug.obj preview
-```
 
 ---
 
