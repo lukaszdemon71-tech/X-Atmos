@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AtmoForge</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<main class="app">
+
+  <header class="head">
+    <span class="mark">ATMOFORGE</span>
+    <div class="seg">
+      <button class="seg-b" data-mode="live">Live</button>
+      <button class="seg-b" data-mode="historical">Historical</button>
+      <button class="seg-b" data-mode="manual">Preset</button>
+    </div>
+    <span class="live" id="statusText">Starting…</span>
+  </header>
+
+  <!-- Named outright when something is overwriting AtmoForge or when the
+       sim has not handed over its rendering controls. Both used to be
+       visible only to someone reading Log.txt line by line. -->
+  <div class="alarm" id="alarm" hidden></div>
+
+  <div class="columns">
+
+    <section class="col" data-col="weather">
+      <h2>Weather</h2>
+      <div class="col-body">
+        <div class="pane" data-pane="historical" hidden>
+          <label class="inp"><span>Date</span><input type="date" id="histDate" min="1940-01-01"></label>
+          <div class="pair">
+            <label class="inp narrow"><span>Hour UTC</span><input type="number" id="histHour" min="0" max="23"></label>
+            <button class="btn" id="btnHistApply">Load</button>
+          </div>
+        </div>
+        <div class="pane" data-pane="manual" hidden>
+          <div class="presets" id="presets"></div>
+        </div>
+        <div class="fields" id="fields-wx"></div>
+      </div>
+      <div class="col-foot">
+        <button class="btn" data-quick="weather:easy">Easy</button>
+        <button class="btn" data-quick="weather:real">Real</button>
+      </div>
+    </section>
+
+    <section class="col" data-col="clouds">
+      <h2>Clouds</h2>
+      <div class="col-body"><div class="fields" id="fields-clouds"></div></div>
+      <div class="col-foot">
+        <button class="btn" data-quick="Light">Light</button>
+        <button class="btn" data-quick="Optimum">Optimum</button>
+        <button class="btn" data-quick="Maximum">Maximum</button>
+      </div>
+    </section>
+
+    <section class="col" data-col="effects">
+      <h2>Light &amp; air</h2>
+      <div class="col-body"><div class="fields" id="fields-atmo"></div></div>
+      <div class="col-foot">
+        <button class="btn" data-quick="Simple">Natural</button>
+        <button class="btn" data-quick="Full">Vivid</button>
+      </div>
+    </section>
+
+    <section class="col" data-col="water">
+      <h2>Water</h2>
+      <div class="col-body"><div class="fields" id="fields-water"></div></div>
+      <div class="col-foot">
+        <button class="btn" data-quick="Disable">Off</button>
+        <button class="btn" data-quick="water:optimum">Optimum</button>
+        <button class="btn" data-quick="water:maximum">Maximum</button>
+      </div>
+    </section>
+
+  </div>
+
+  <footer class="foot">
+    <button class="btn" id="btnRefresh">Refresh</button>
+    <button class="btn" id="btnMetar">METAR</button>
+    <button class="btn" id="btnBriefing">Briefing</button>
+    <button class="btn" id="btnAudit">Datarefs</button>
+    <div class="grow"></div>
+    <button class="btn primary" id="btnDone">Done</button>
+  </footer>
+
+  <div class="overlay" id="overlay" hidden>
+    <div class="sheet">
+      <div class="sheet-head">
+        <h3 id="sheetTitle">—</h3>
+        <label class="inp narrow" id="icaoWrap" hidden>
+          <input id="metarIcao" maxlength="4" placeholder="nearest" spellcheck="false" autocomplete="off">
+        </label>
+        <button class="btn" id="sheetClose">Close</button>
+      </div>
+      <div class="sheet-body" id="sheetBody"></div>
+    </div>
+  </div>
+
+</main>
+<script src="app.js"></script>
+</body>
+</html>

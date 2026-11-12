@@ -1,0 +1,49 @@
+name: Windows x64
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  plugin-build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install the X-Plane SDK
+        shell: pwsh
+        run: |
+          & scripts/install-xplane-sdk.ps1 -DepsDir $env:RUNNER_TEMP
+          "XPLANE_SDK_PATH=$env:XPLANE_SDK_PATH" | Out-File -FilePath $env:GITHUB_ENV -Append
+
+      - name: Configure
+        run: cmake -S . -B build -A x64 -DXPLANE_SDK_PATH="$env:XPLANE_SDK_PATH" -DATMOFORGE_TESTS=ON
+
+      - name: Build
+        run: cmake --build build --config Release
+
+      - name: Test
+        run: ctest --test-dir build -C Release --output-on-failure
+
+      - name: Check the bundle
+        shell: pwsh
+        run: |
+          $plugin = "build/AtmoForge/win_x64/AtmoForge.xpl"
+          if (-not (Test-Path $plugin)) { throw "Plugin binary missing: $plugin" }
+          foreach ($page in "index.html", "style.css", "app.js") {
+            $path = "build/AtmoForge/win_x64/ui/$page"
+            if (-not (Test-Path $path)) { throw "UI file missing: $path" }
+          }
+          New-Item -ItemType Directory -Force -Path package | Out-Null
+          Copy-Item -Path build/AtmoForge -Destination package -Recurse -Force
+
+      - name: Upload the plugin bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: AtmoForge-win_x64
+          path: package/
+          if-no-files-found: error
+          retention-days: 14

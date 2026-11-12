@@ -148,15 +148,52 @@ and you will see them fight.
 
 ---
 
+## What is in this repository
+
+```
+src/                  the plugin, 11 translation units
+ui/                   the panel: index.html, style.css, app.js
+ui/dev/               mock bridge + generators, so the panel runs in a browser
+tests/                969 checks, SDK stubs, UI wiring check
+scripts/              build-win-cross.sh (Linux -> Windows), SDK fetcher
+tools/vehicles/       OBJ8 model generator and a software renderer to check it
+dist/AtmoForge/       the built plugin, ready to drop into plugins/
+.github/workflows/    Windows build on push
+```
+
+`dist/AtmoForge/` is tracked deliberately: copy that folder into
+`X-Plane 12/Resources/plugins/` and the plugin runs — no build step, no
+Visual Studio, no VC++ redistributable.
+
+To rebuild it:
+
+```bash
+TOOLCHAIN=/path/to/llvm-mingw/bin SDK=/path/to/xpsdk ./scripts/build-win-cross.sh
+```
+
+That script carries the flags that matter and refuses to produce a plugin
+X-Plane would reject — see its header comment for why each one is there.
+
+`tools/vehicles/` is separate from the plugin: it generates X-Plane ground
+vehicles as OBJ8 text and renders them to PNG so the geometry can be checked
+without opening the simulator.
+
+```bash
+python3 tools/vehicles/build_tug.py
+python3 tools/vehicles/preview.py tools/vehicles/out/pushback_tug/pushback_tug.obj preview
+```
+
+---
+
 ## Testing
 
 ```bash
 tests/run.sh
 ```
 
-Two stages, neither needing X-Plane:
+Three stages, none needing X-Plane:
 
-1. **The core suite** — 181 checks over the JSON reader, the Open-Meteo parser
+1. **The core suite** — 969 checks over the JSON reader, the Open-Meteo parser
    against a synthetic response, hour selection, every derived hazard,
    blending (including that wind backing through north takes the short way),
    URL construction, METAR encoding, all eight presets, and settings clamping
@@ -164,9 +201,21 @@ Two stages, neither needing X-Plane:
 2. **A type-check of every source file**, including the ones that call the SDK,
    against the stub headers in `tests/sdk_stub/`. Those stubs are declarations
    only — see `tests/sdk_stub/README.md`.
+3. **A UI wiring check** (`ui/dev/check-ui.py`) that the page, the script and
+   the settings table still agree: every section with a visible setting has a
+   column to render into, every element id `app.js` binds exists, and every
+   quick set the buttons ask for is defined in C++. This catches the failure
+   mode where one stale id throws during wiring and the whole panel comes up
+   empty, which no amount of C++ testing would have found.
 
 `ui/dev/` holds a mock of the browser bridge so the page can be opened in a
-desktop browser: `ui/dev/harness.html?scenario=storm`.
+desktop browser. Regenerate the harness after editing the page, then open it:
+
+```bash
+python3 ui/dev/gen-harness.py
+# ui/dev/harness.html?scenario=storm   a different weather situation
+# ui/dev/harness.html?alarm=1          the overwritten / no-rendering-controls warnings
+```
 
 ---
 
